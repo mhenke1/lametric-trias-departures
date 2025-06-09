@@ -57,7 +57,7 @@ export class TriasService {
             </LocationRef>
             </Location>
             <Params>
-            <NumberOfResults>20</NumberOfResults>
+            <NumberOfResults>30</NumberOfResults>
             <StopEventType>departure</StopEventType>
             <IncludePreviousCalls>false</IncludePreviousCalls>
             <IncludeOnwardCalls>false</IncludeOnwardCalls>
@@ -97,28 +97,39 @@ export class TriasService {
   }
 
   private parseSingleStopEvent(event: any): BusDeparture | null {
-    try {
-      const serviceInfo = event?.StopEvent?.Service?.ServiceSection?.PublishedLineName?.Text;
-      const time = event?.StopEvent?.ThisCall?.CallAtStop?.ServiceDeparture?.EstimatedTime || event?.StopEvent?.ThisCall?.CallAtStop?.ServiceDeparture?.TimetabledTime;
+  try {
+    console.log("Parsing single stop event:", event.StopEvent.Service.ServiceSection.DirectionRef);
+    const serviceInfo = event?.StopEvent?.Service?.ServiceSection?.PublishedLineName?.Text;
+    const time = event?.StopEvent?.ThisCall?.CallAtStop?.ServiceDeparture?.EstimatedTime || 
+                 event?.StopEvent?.ThisCall?.CallAtStop?.ServiceDeparture?.TimetabledTime;
+    const direction:string = event?.StopEvent?.Service?.ServiceSection?.DirectionRef;
 
-      if (!serviceInfo || !time) {
-        return null;
-      }
-
-      const departureTime = new Date(time);
-      const timeString = departureTime.toLocaleTimeString('de-DE', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Europe/Berlin'
-      });
-
-      return {
-        line: serviceInfo,
-        time: timeString
-      };
-    } catch (error) {
-      console.error('Error parsing single stop event:', error);
+    if (!serviceInfo || !time || !direction) {
       return null;
     }
+
+    // Filter for specific lines and directions
+    const isLine7Inward = serviceInfo === '7' && direction.toLowerCase().includes('inward');
+    const isLine2Outward = serviceInfo === '2' && direction.toLowerCase().includes('outward');
+
+    if (!isLine7Inward && !isLine2Outward) {
+      return null;
+    }
+
+    const departureTime = new Date(time);
+    const timeString = new Intl.DateTimeFormat('de-DE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Berlin'
+    }).format(departureTime);
+
+    return {
+      line: serviceInfo,
+      time: timeString,
+    };
+  } catch (error) {
+    console.error('Error parsing single stop event:', error);
+    return null;
   }
+}
 }
