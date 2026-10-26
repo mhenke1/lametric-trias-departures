@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import path from 'path';
 import dotenv from 'dotenv';
 import { TriasService } from './services/triasService';
 import { formatForLametric } from './utils/lametricFormatter';
@@ -12,6 +13,8 @@ const triasService = new TriasService({
   endpoint: process.env.TRIAS_ENDPOINT!,
   token: process.env.TRIAS_TOKEN!,
 });
+
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/departures/:stationId', async (req: Request, res: Response) => {
   try {

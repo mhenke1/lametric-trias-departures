@@ -30,6 +30,8 @@ RUN npm ci --only=production
 # Copy built JavaScript files from builder
 COPY --from=builder /app/dist ./dist
 
+COPY public ./public
+
 # Set environment variables
 ENV NODE_ENV=production
 
