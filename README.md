@@ -28,3 +28,7 @@ npm ci
 npm run dev      # development
 npm run build && node dist/app.js
 ```
+
+## Deployment
+
+The Code Engine deploy pipeline lives on the separate branch `feature/code-engine-pipeline`; see the README there for the required secrets and variables.
