@@ -1,0 +1,18 @@
+<div class="layout layout--col gap--space-between">
+  <div class="list">
+    {% for l in lines %}
+    <div class="item">
+      <div class="content">
+        <span class="value value--xxlarge value--tnums">{{ l.line }}</span>
+        <span class="value value--xlarge value--tnums">{{ l.times | join: "  " }}</span>
+      </div>
+    </div>
+    {% else %}
+    <span class="value value--large">Keine Abfahrten</span>
+    {% endfor %}
+  </div>
+</div>
+<div class="title_bar">
+  <span class="title">Abfahrten</span>
+  <span class="instance">{{ station }}</span>
+</div>
