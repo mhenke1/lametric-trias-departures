@@ -1,0 +1,52 @@
+name: Deploy to IBM Code Engine
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  IBM_CLOUD_REGION: ${{ vars.IBM_CLOUD_REGION || 'eu-de' }}
+  CE_PROJECT: ${{ vars.CE_PROJECT }}
+  CE_APP: ${{ vars.CE_APP || 'trias-departures' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install IBM Cloud CLI
+        run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+          ibmcloud plugin install code-engine -f
+
+      - name: Login and select project
+        env:
+          IBM_CLOUD_API_KEY: ${{ secrets.IBM_CLOUD_API_KEY }}
+        run: |
+          ibmcloud login --apikey "$IBM_CLOUD_API_KEY" -r "$IBM_CLOUD_REGION"
+          ibmcloud ce project select --name "$CE_PROJECT"
+
+      - name: Build from source and deploy (scale to zero)
+        env:
+          TRIAS_ENDPOINT: ${{ secrets.TRIAS_ENDPOINT }}
+          TRIAS_TOKEN: ${{ secrets.TRIAS_TOKEN }}
+        run: |
+          if ibmcloud ce application get --name "$CE_APP" >/dev/null 2>&1; then
+            CMD=update
+          else
+            CMD=create
+          fi
+          ibmcloud ce application "$CMD" --name "$CE_APP" \
+            --build-source . --strategy dockerfile \
+            --port 3000 --min-scale 0 --max-scale 1 \
+            --env TRIAS_ENDPOINT="$TRIAS_ENDPOINT" \
+            --env TRIAS_TOKEN="$TRIAS_TOKEN" \
+            --wait
