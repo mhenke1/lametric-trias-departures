@@ -28,18 +28,3 @@ npm ci
 npm run dev      # development
 npm run build && node dist/app.js
 ```
-
-## Deployment (IBM Code Engine)
-
-`.github/workflows/deploy.yml` deploys on every push to `main` (or manually). Credentials come from GitHub (Enterprise) Actions secrets and variables, never from the repo:
-
-| Type | Name | Description |
-|---|---|---|
-| Secret | `IBM_CLOUD_API_KEY` | IBM Cloud API key |
-| Secret | `TRIAS_ENDPOINT` | passed to the app as env var |
-| Secret | `TRIAS_TOKEN` | passed to the app as env var |
-| Variable | `CE_PROJECT` | Code Engine project name (required) |
-| Variable | `IBM_CLOUD_REGION` | default `eu-de` |
-| Variable | `CE_APP` | default `trias-departures` |
-
-Add them under *Settings → Secrets and variables → Actions*. To enable the TRMNL token, add a `TRMNL_TOKEN` secret and an extra `--env TRMNL_TOKEN=...` line in the workflow.
