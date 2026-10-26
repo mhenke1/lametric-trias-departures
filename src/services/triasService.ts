@@ -10,7 +10,7 @@ export class TriasService {
   constructor(config: TriasConfig) {
     this.config = config;
     // Initialize cache with 5 minutes TTL
-    this.cache = new NodeCache({ stdTTL: 180 }); // 180 seconds = 3 minutes
+    this.cache = new NodeCache({ stdTTL: 180, checkperiod: 0 }); // 180 seconds = 3 minutes
   }
 
   async getDepartures(stationId: string): Promise<BusDeparture[]> {

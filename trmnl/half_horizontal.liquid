@@ -1,0 +1,11 @@
+<div class="layout layout--col">
+  {% for l in lines limit: 2 %}
+  <div class="item">
+    <div class="content">
+      <span class="value value--xlarge value--tnums">{{ l.line }}</span>
+      <span class="value value--large value--tnums">{{ l.times | slice: 0, 3 | join: "  " }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="title_bar"><span class="title">Abfahrten</span></div>
